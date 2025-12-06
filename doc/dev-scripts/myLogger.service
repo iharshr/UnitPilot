@@ -1,0 +1,6 @@
+[Unit]
+Description=Simple log writing service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/log-systemd.sh

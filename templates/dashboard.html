@@ -1,0 +1,252 @@
+{{define "dashboard.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - UniPilot Admin</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h1 class="text-xl font-bold">UniPilot Admin</h1>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <a href="/" class="hover:text-blue-200 transition-colors flex items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="/cron" class="hover:text-blue-200 transition-colors flex items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Cron Jobs
+                    </a>
+                    <a href="/systemd" class="hover:text-blue-200 transition-colors flex items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                        </svg>
+                        Services
+                    </a>
+                    <a href="/logs" class="hover:text-blue-200 transition-colors flex items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Logs
+                    </a>
+                    <a href="/logout" class="hover:text-blue-200 transition-colors flex items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="space-y-8">
+            <!-- Page Header -->
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
+                <p class="text-gray-600">System overview and recent activity</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Cron Jobs Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Cron Jobs</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-2">{{len .CronJobs}}</p>
+                            <p class="text-sm text-gray-500 mt-1">Total scheduled tasks</p>
+                        </div>
+                        <div class="bg-blue-100 rounded-full p-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="/cron" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center">
+                            Manage Jobs
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Services Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Services</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-2">{{len .Units}}</p>
+                            <p class="text-sm text-gray-500 mt-1">Monitored systemd units</p>
+                        </div>
+                        <div class="bg-green-100 rounded-full p-4">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="/systemd" class="text-green-600 hover:text-green-700 text-sm font-medium flex items-center">
+                            View Services
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Logs Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Recent Logs</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-2">{{len .Logs}}</p>
+                            <p class="text-sm text-gray-500 mt-1">Last 10 entries</p>
+                        </div>
+                        <div class="bg-purple-100 rounded-full p-4">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="/logs" class="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center">
+                            View All Logs
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Cron Jobs -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Recent Cron Jobs
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {{if .CronJobs}}
+                        <div class="space-y-3">
+                            {{range .CronJobs}}
+                            <div class="border-l-4 {{if .Enabled}}border-green-500 bg-green-50{{else}}border-gray-300 bg-gray-50{{end}} p-4 rounded-r hover:shadow transition-shadow">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-900 mb-1">{{.Command}}</p>
+                                        <div class="flex items-center text-sm text-gray-600 space-x-4">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                {{.Schedule}}
+                                            </span>
+                                            {{if .LastRun}}
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                {{.LastRun.Format "Jan 2, 15:04"}}
+                                            </span>
+                                            {{end}}
+                                        </div>
+                                    </div>
+                                    <span class="ml-4 px-2 py-1 text-xs font-semibold rounded {{if .Enabled}}bg-green-200 text-green-800{{else}}bg-gray-200 text-gray-800{{end}}">
+                                        {{if .Enabled}}Enabled{{else}}Disabled{{end}}
+                                    </span>
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+                        {{else}}
+                        <div class="text-center py-8 text-gray-500">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p>No cron jobs configured yet</p>
+                            <a href="/cron" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Create your first job →</a>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+
+                <!-- Recent Logs -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Activity Log
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {{if .Logs}}
+                        <div class="space-y-3 max-h-96 overflow-y-auto">
+                            {{range .Logs}}
+                            <div class="flex items-start space-x-3 text-sm hover:bg-gray-50 p-2 rounded transition-colors">
+                                <span class="text-gray-500 text-xs whitespace-nowrap mt-0.5">
+                                    {{.Timestamp.Format "15:04:05"}}
+                                </span>
+                                <span class="px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap
+                                    {{if eq .Level "error"}}bg-red-100 text-red-800
+                                    {{else if eq .Level "warn"}}bg-yellow-100 text-yellow-800
+                                    {{else}}bg-blue-100 text-blue-800{{end}}">
+                                    {{.Level}}
+                                </span>
+                                <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700 whitespace-nowrap">
+                                    {{.Source}}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-gray-700 truncate">{{.Message}}</p>
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+                        {{else}}
+                        <div class="text-center py-8 text-gray-500">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p>No logs available</p>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-4 text-center text-gray-600 text-sm">
+        <p>UniPilot Admin v1.0 | Open Source System Management Tool</p>
+    </footer>
+</body>
+</html>
+{{end}}

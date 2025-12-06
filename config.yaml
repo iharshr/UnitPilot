@@ -1,0 +1,50 @@
+# UniPilot Admin Enhanced Configuration
+
+# Database configuration
+db_path: "./tmp/cronsys.db"
+
+# HTTP server configuration
+listen_addr: ":8080"
+
+# Session secret for cookie encryption (change this in production!)
+# Generate with: openssl rand -base64 32
+session_secret: "change-me-to-a-random-64-character-string-for-production-use"
+
+# Systemd service filtering
+# Only show services matching these prefixes (empty = show all)
+systemd_prefixes:
+  # - "nginx"
+  # - "postgresql"
+  # - "redis"
+  # - "docker"
+  # - "mysql"
+  # - "apache"
+  # - "ssh"
+
+# File management directories
+# Directory for uploaded bash scripts
+scripts_dir: "./cron-scripts"
+
+# Directory for systemd unit files (local copies)
+systemd_dir: "./systemd-units"
+
+# Optional: URL to push logs to external telemetry system
+# Leave empty to disable remote log export
+log_export_url: ""
+
+# Example configurations for different setups:
+
+# Development setup:
+# db_path: "./cronsys.db"
+# listen_addr: ":8080"
+# scripts_dir: "./scripts"
+# systemd_dir: "./systemd-units"
+# systemd_prefixes: []  # Show all services
+
+# Production setup:
+# db_path: "/var/lib/unipilot/cronsys.db"
+# listen_addr: "127.0.0.1:8080"  # Only listen on localhost (use reverse proxy)
+# scripts_dir: "/var/lib/unipilot/scripts"
+# systemd_dir: "/var/lib/unipilot/systemd-units"
+# systemd_prefixes: ["myapp", "nginx", "postgresql"]
+# log_export_url: "http://loki.internal:3100/loki/api/v1/push"
