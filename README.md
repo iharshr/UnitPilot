@@ -174,7 +174,7 @@ sudo ./unipilot-admin
 
 ```yaml
 # Database
-db_path: "./cronsys.db"
+db_path: "./unitpilot.db"
 
 # Server
 listen_addr: ":8080"

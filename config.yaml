@@ -1,7 +1,7 @@
 # UniPilot Admin Enhanced Configuration
 
 # Database configuration
-db_path: "./tmp/cronsys.db"
+db_path: "./tmp/unitpilot.db"
 
 # HTTP server configuration
 listen_addr: ":8080"
@@ -35,14 +35,14 @@ log_export_url: ""
 # Example configurations for different setups:
 
 # Development setup:
-# db_path: "./cronsys.db"
+# db_path: "./unitpilot.db"
 # listen_addr: ":8080"
 # scripts_dir: "./scripts"
 # systemd_dir: "./systemd-units"
 # systemd_prefixes: []  # Show all services
 
 # Production setup:
-# db_path: "/var/lib/unipilot/cronsys.db"
+# db_path: "/var/lib/unipilot/unitpilot.db"
 # listen_addr: "127.0.0.1:8080"  # Only listen on localhost (use reverse proxy)
 # scripts_dir: "/var/lib/unipilot/scripts"
 # systemd_dir: "/var/lib/unipilot/systemd-units"
