@@ -13,20 +13,21 @@ session_secret: "change-me-to-a-random-64-character-string-for-production-use"
 # Systemd service filtering
 # Only show services matching these prefixes (empty = show all)
 systemd_prefixes:
-  # - "nginx"
-  # - "postgresql"
-  # - "redis"
-  # - "docker"
-  # - "mysql"
-  # - "apache"
-  # - "ssh"
+  - "nginx"
+  - "postgresql"
+  - "redis"
+  - "docker"
+  - "mysql"
+  - "apache"
+  - "ssh"
+  - "openvpn"
 
 # File management directories
 # Directory for uploaded bash scripts
-scripts_dir: "./cron-scripts"
+scripts_dir: "./tmp/cron-scripts"
 
 # Directory for systemd unit files (local copies)
-systemd_dir: "./systemd-units"
+systemd_dir: "./tmp/systemd-units"
 
 # Optional: URL to push logs to external telemetry system
 # Leave empty to disable remote log export

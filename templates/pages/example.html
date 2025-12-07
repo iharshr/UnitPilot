@@ -1,0 +1,293 @@
+{{/* Example: templates/pages/example.html - Shows all components in action */}}
+{{define "content"}}
+<div class="space-y-6">
+    <!-- Page Header with Actions -->
+    <div class="flex justify-between items-start">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Example Page</h2>
+            <p class="text-gray-600">Demonstration of all reusable components</p>
+        </div>
+        <div class="flex gap-3">
+            {{template "button" dict 
+                "variant" "primary" 
+                "icon" "plus" 
+                "text" "New Item" 
+                "onclick" "openCreateModal()"}}
+            {{template "button" dict 
+                "variant" "success" 
+                "icon" "upload" 
+                "text" "Upload" 
+                "onclick" "openUploadModal()"}}
+            {{template "button" dict 
+                "variant" "secondary" 
+                "icon" "refresh" 
+                "text" "Refresh" 
+                "onclick" "window.location.reload()"}}
+        </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start">
+        <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <div class="flex-1">
+            <h3 class="text-sm font-semibold text-blue-900 mb-1">Component System</h3>
+            <p class="text-sm text-blue-800">
+                This page demonstrates all reusable components. Check the source code to see implementation examples.
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Total Items</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">42</p>
+                </div>
+                <div class="bg-blue-100 rounded-full p-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Active</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">28</p>
+                </div>
+                <div class="bg-green-100 rounded-full p-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase">Errors</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2">3</p>
+                </div>
+                <div class="bg-red-100 rounded-full p-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Button Variants Showcase -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Button Components</h3>
+        <div class="space-y-4">
+            <div class="flex flex-wrap gap-3">
+                <span class="text-sm text-gray-600 w-full">Standard Buttons:</span>
+                {{template "button" dict "variant" "primary" "text" "Primary"}}
+                {{template "button" dict "variant" "secondary" "text" "Secondary"}}
+                {{template "button" dict "variant" "success" "text" "Success"}}
+                {{template "button" dict "variant" "danger" "text" "Danger"}}
+                {{template "button" dict "variant" "warning" "text" "Warning"}}
+                {{template "button" dict "variant" "primary" "text" "Disabled" "disabled" true}}
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+                <span class="text-sm text-gray-600 w-full">Buttons with Icons:</span>
+                {{template "button" dict "variant" "primary" "icon" "plus" "text" "Add Item"}}
+                {{template "button" dict "variant" "success" "icon" "upload" "text" "Upload"}}
+                {{template "button" dict "variant" "danger" "icon" "delete" "text" "Delete"}}
+                {{template "button" dict "variant" "secondary" "icon" "refresh" "text" "Refresh"}}
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+                <span class="text-sm text-gray-600 w-full">Icon-Only Buttons:</span>
+                {{template "button" dict "variant" "icon" "color" "blue" "icon" "view" "title" "View"}}
+                {{template "button" dict "variant" "icon" "color" "green" "icon" "edit" "title" "Edit"}}
+                {{template "button" dict "variant" "icon" "color" "red" "icon" "delete" "title" "Delete"}}
+                {{template "button" dict "variant" "icon" "color" "blue" "icon" "play" "title" "Run"}}
+                {{template "button" dict "variant" "icon" "color" "gray" "icon" "refresh" "title" "Refresh"}}
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table Example -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800">Data Table</h3>
+            {{template "button" dict "variant" "primary" "icon" "plus" "text" "Add Row" "onclick" "alert('Add clicked')"}}
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Example Item 1</p>
+                                    <p class="text-xs text-gray-500">Created 2 hours ago</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Type A</td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            {{template "button" dict "variant" "icon" "color" "blue" "icon" "view" "title" "View" "onclick" "alert('View')"}}
+                            {{template "button" dict "variant" "icon" "color" "green" "icon" "edit" "title" "Edit" "onclick" "alert('Edit')"}}
+                            {{template "button" dict "variant" "icon" "color" "red" "icon" "delete" "title" "Delete" "onclick" "alert('Delete')"}}
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Example Item 2</p>
+                                    <p class="text-xs text-gray-500">Created 5 hours ago</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                                Inactive
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Type B</td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            {{template "button" dict "variant" "icon" "color" "blue" "icon" "view" "title" "View" "onclick" "alert('View')"}}
+                            {{template "button" dict "variant" "icon" "color" "green" "icon" "edit" "title" "Edit" "onclick" "alert('Edit')"}}
+                            {{template "button" dict "variant" "icon" "color" "red" "icon" "delete" "title" "Delete" "onclick" "alert('Delete')"}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- File Cards Grid -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">File Cards</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {{range .ExampleFiles}}
+            {{template "file-card" .}}
+            {{end}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Definitions -->
+{{template "modal" dict "id" "createModal" "title" "Create New Item" "icon" "file" "size" "lg"}}
+{{template "modal" dict "id" "uploadModal" "title" "Upload File" "icon" "upload" "size" "md"}}
+{{template "modal" dict "id" "viewModal" "title" "View Details" "icon" "view" "size" "4xl"}}
+
+<script>
+function openCreateModal() {
+    const body = `
+        <form id="createForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <input type="text" name="name" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <select name="type" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="A">Type A</option>
+                    <option value="B">Type B</option>
+                    <option value="C">Type C</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea name="description" rows="3" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" name="active" checked id="active" class="mr-2 w-4 h-4">
+                <label for="active" class="text-sm text-gray-700">Set as active</label>
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
+                    Create
+                </button>
+                <button type="button" onclick="closeModal('createModal')" 
+                    class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    openModal('createModal', 'Create New Item', body);
+    
+    document.getElementById('createForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Form submitted!');
+        closeModal('createModal');
+    });
+}
+
+function openUploadModal() {
+    const body = `
+        <form id="uploadForm" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select File</label>
+                <input type="file" name="file" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 font-medium">
+                    Upload
+                </button>
+                <button type="button" onclick="closeModal('uploadModal')" 
+                    class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    openModal('uploadModal', 'Upload File', body);
+    
+    document.getElementById('uploadForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Upload initiated!');
+        closeModal('uploadModal');
+    });
+}
+</script>
+{{end}}

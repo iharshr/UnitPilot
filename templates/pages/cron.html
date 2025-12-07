@@ -1,0 +1,303 @@
+{{/* templates/pages/cron.html - Updated with file support */}}
+{{define "content"}}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex justify-between items-start">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Cron Jobs Management</h2>
+            <p class="text-gray-600">Schedule and manage automated tasks</p>
+        </div>
+        {{template "button" dict "variant" "primary" "icon" "plus" "text" "New Cron Job" "onclick" "openCreateCronModal()"}}
+    </div>
+
+    <!-- Cron Jobs Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        {{if .Jobs}}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Schedule</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Command</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Run</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {{range .Jobs}}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{if .Enabled}}bg-green-100 text-green-800{{else}}bg-gray-100 text-gray-800{{end}}">
+                                {{if .Enabled}}Enabled{{else}}Disabled{{end}}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <code class="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{{.Schedule}}</code>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="max-w-xs">
+                                <p class="text-sm font-mono truncate" title="{{.Command}}">{{.Command}}</p>
+                                {{if .Description}}<p class="text-xs text-gray-500 mt-1">{{.Description}}</p>{{end}}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm">{{.UserName}}</td>
+                        <td class="px-6 py-4 text-sm">
+                            {{if .LastRun}}{{.LastRun.Format "Jan 2, 15:04"}}{{else}}<span class="text-gray-400">Never</span>{{end}}
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            {{template "button" dict "variant" "icon" "color" "blue" "icon" "edit" "title" "Edit" "onclick" (printf "editCronJob(%d)" .ID)}}
+                            {{template "button" dict "variant" "icon" "color" "yellow" "title" "Toggle" 
+                                "hx_post" (printf "/cron/toggle?id=%d&enabled=%v" .ID (not .Enabled))}}
+                            {{template "button" dict "variant" "icon" "color" "green" "icon" "play" "title" "Run Now" 
+                                "hx_post" (printf "/cron/run?id=%d" .ID)}}
+                            {{template "button" dict "variant" "icon" "color" "red" "icon" "delete" "title" "Delete" 
+                                "onclick" (printf "deleteCronJob(%d)" .ID)}}
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Cron Jobs Yet</h3>
+            <p class="text-gray-600 mb-4">Create your first scheduled task</p>
+            {{template "button" dict "variant" "primary" "icon" "plus" "text" "Create Cron Job" "onclick" "openCreateCronModal()"}}
+        </div>
+        {{end}}
+    </div>
+</div>
+
+<!-- Create/Edit Modal -->
+{{template "modal" dict "id" "cronModal" "title" "Create Cron Job" "icon" "clock" "size" "lg"}}
+
+<script>
+function openCreateCronModal() {
+    const body = `
+        <form id="cronForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">User</label>
+                <input type="text" name="user_name" value="root" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Schedule 
+                    <span class="text-xs text-gray-500">(cron format: minute hour day month weekday)</span>
+                </label>
+                <input type="text" name="schedule" placeholder="*/5 * * * *" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono">
+                <div class="mt-1 text-xs text-gray-500">
+                    Examples: */5 * * * * (every 5 min), 0 2 * * * (daily at 2am), 0 0 * * 0 (weekly)
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Execution Mode</label>
+                <select id="exec_mode" onchange="toggleExecMode()" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="command">Enter Command</option>
+                    <option value="file">Use Existing File</option>
+                </select>
+            </div>
+            
+            <div id="command_input">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Command</label>
+                <input type="text" name="command" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono">
+            </div>
+            
+            <div id="file_selector" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Script File</label>
+                <select name="file_id" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- Select a file --</option>
+                    {{range .CronFiles}}
+                    <option value="{{.ID}}">{{.Filename}}</option>
+                    {{end}}
+                </select>
+                <div class="mt-2 text-xs text-gray-600">
+                    <a href="/files" class="text-blue-600 hover:underline">Manage files →</a>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
+                <input type="text" name="description" placeholder="Backup database" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" name="enabled" checked id="enabled" class="mr-2 w-4 h-4">
+                <label for="enabled" class="text-sm text-gray-700">Enable immediately</label>
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
+                    Create Job
+                </button>
+                <button type="button" onclick="closeModal('cronModal')" 
+                    class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    openModal('cronModal', 'Create Cron Job', body);
+    
+    document.getElementById('cronForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        // Handle file_id vs command based on mode
+        const execMode = document.getElementById('exec_mode').value;
+        if (execMode === 'file') {
+            formData.delete('command');
+            const fileId = formData.get('file_id');
+            if (!fileId) {
+                alert('Please select a file');
+                return;
+            }
+        } else {
+            formData.delete('file_id');
+            if (!formData.get('command')) {
+                alert('Please enter a command');
+                return;
+            }
+        }
+        
+        try {
+            const response = await fetch('/cron/create', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                alert('Cron job created successfully!');
+                window.location.reload();
+            } else {
+                const error = await response.text();
+                alert('Creation failed: ' + error);
+            }
+        } catch (error) {
+            alert('Error: ' + error);
+        }
+    });
+}
+
+function toggleExecMode() {
+    const mode = document.getElementById('exec_mode').value;
+    const fileSelector = document.getElementById('file_selector');
+    const commandInput = document.getElementById('command_input');
+    
+    if (mode === 'file') {
+        fileSelector.classList.remove('hidden');
+        commandInput.classList.add('hidden');
+        fileSelector.querySelector('select').required = true;
+        commandInput.querySelector('input').required = false;
+    } else {
+        fileSelector.classList.add('hidden');
+        commandInput.classList.remove('hidden');
+        fileSelector.querySelector('select').required = false;
+        commandInput.querySelector('input').required = true;
+    }
+}
+
+async function editCronJob(id) {
+    try {
+        const response = await fetch(`/cron/get?id=${id}`);
+        const job = await response.json();
+        
+        const body = `
+            <form id="editCronForm" class="space-y-4">
+                <input type="hidden" name="id" value="${id}">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Schedule</label>
+                    <input type="text" name="schedule" value="${job.schedule}" required 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Command</label>
+                    <input type="text" name="command" value="${escapeHtml(job.command)}" required 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <input type="text" name="description" value="${job.description || ''}" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
+                        Save Changes
+                    </button>
+                    <button type="button" onclick="closeModal('cronModal')" 
+                        class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        `;
+        
+        openModal('cronModal', 'Edit Cron Job', body);
+        
+        document.getElementById('editCronForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/cron/edit', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('Cron job updated!');
+                    window.location.reload();
+                } else {
+                    alert('Update failed');
+                }
+            } catch (error) {
+                alert('Error: ' + error);
+            }
+        });
+    } catch (error) {
+        alert('Error loading job: ' + error);
+    }
+}
+
+async function deleteCronJob(id) {
+    if (!confirm('Delete this cron job? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/cron/delete?id=${id}`, { method: 'POST' });
+        if (response.ok) {
+            alert('Cron job deleted!');
+            window.location.reload();
+        } else {
+            alert('Delete failed');
+        }
+    } catch (error) {
+        alert('Error: ' + error);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{{end}}

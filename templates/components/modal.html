@@ -1,0 +1,92 @@
+{{/* templates/components/modal.html */}}
+{{define "modal"}}
+<div id="{{.id}}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-backdrop">
+    <div class="bg-white rounded-lg shadow-xl w-full {{if .size}}max-w-{{.size}}{{else}}max-w-2xl{{end}} max-h-[90vh] overflow-hidden flex flex-col modal-content">
+        <!-- Header -->
+        <div class="{{if .headerClass}}{{.headerClass}}{{else}}bg-gray-800 text-white{{end}} px-6 py-4 flex justify-between items-center">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+                {{if .icon}}{{template "modal-icon" .icon}}{{end}}
+                <span id="{{.id}}-title">{{.title}}</span>
+            </h3>
+            <button onclick="closeModal('{{.id}}')" 
+                    class="{{if .headerClass}}text-gray-600 hover:text-gray-800{{else}}text-gray-300 hover:text-white{{end}} text-3xl leading-none transition-colors">
+                &times;
+            </button>
+        </div>
+        
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-6" id="{{.id}}-body">
+            {{if .content}}{{.content}}{{end}}
+        </div>
+        
+        <!-- Footer (optional) -->
+        {{if .footer}}
+        <div class="bg-gray-50 px-6 py-4 flex gap-3 border-t border-gray-200">
+            {{.footer}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{define "modal-icon"}}
+{{if eq . "file"}}
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+</svg>
+{{else if eq . "edit"}}
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+</svg>
+{{else if eq . "upload"}}
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+</svg>
+{{else if eq . "view"}}
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+</svg>
+{{end}}
+{{end}}
+
+<script>
+function openModal(modalId, title, bodyContent) {
+    const modal = document.getElementById(modalId);
+    if (title) {
+        document.getElementById(modalId + '-title').textContent = title;
+    }
+    if (bodyContent) {
+        document.getElementById(modalId + '-body').innerHTML = bodyContent;
+    }
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal-backdrop:not(.hidden)');
+        modals.forEach(modal => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+    }
+});
+</script>

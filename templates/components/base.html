@@ -1,0 +1,62 @@
+{{/* templates/components/base.html */}}
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - UniPilot Admin</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        
+        .htmx-request .htmx-indicator { display: inline-block; }
+        .htmx-indicator { display: none; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        
+        /* Modal animations */
+        .modal-backdrop {
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    {{template "header" .}}
+    
+    <main class="container mx-auto px-4 py-8 flex-1">
+        {{template "content" .}}
+    </main>
+    
+    {{template "footer" .}}
+    
+    <script>
+        htmx.config.timeout = 10000;
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            evt.detail.target.classList.add('fade-in');
+        });
+    </script>
+</body>
+</html>
+{{end}}
+
+{{define "footer"}}
+<footer class="mt-auto py-4 text-center text-gray-600 text-sm border-t border-gray-200">
+    <p>UniPilot Admin v2.0 | Open Source System Management Tool</p>
+</footer>
+{{end}}

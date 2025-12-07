@@ -1,0 +1,412 @@
+{{/* templates/pages/files.html */}}
+{{define "content"}}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex justify-between items-start">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">File Management</h2>
+            <p class="text-gray-600">Manage scripts and configuration files for cron jobs and systemd services</p>
+        </div>
+        <div class="flex gap-3">
+            {{template "button" dict "variant" "success" "icon" "plus" "text" "New File" "onclick" "openCreateFileModal()"}}
+            {{template "button" dict "variant" "primary" "icon" "upload" "text" "Upload" "onclick" "openUploadModal()"}}
+        </div>
+    </div>
+
+    <!-- File Type Tabs -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <button onclick="switchFileTab('all')" id="tab-all" class="file-tab active">
+                    All Files ({{len .Files}})
+                </button>
+                <button onclick="switchFileTab('cron')" id="tab-cron" class="file-tab">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Cron Scripts ({{.CronCount}})
+                </button>
+                <button onclick="switchFileTab('systemd')" id="tab-systemd" class="file-tab">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                    </svg>
+                    Systemd Units ({{.SystemdCount}})
+                </button>
+            </nav>
+        </div>
+
+        <!-- File Grid -->
+        <div class="p-6">
+            {{if .Files}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="file-grid">
+                {{range .Files}}
+                {{template "file-card" .}}
+                {{end}}
+            </div>
+            {{else}}
+            <div class="text-center py-12">
+                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Files Yet</h3>
+                <p class="text-gray-600 mb-4">Upload or create your first file to get started</p>
+                {{template "button" dict "variant" "primary" "icon" "plus" "text" "Create File" "onclick" "openCreateFileModal()"}}
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Info Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-green-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-green-900 mb-2">Cron Scripts (.sh)</h3>
+                    <ul class="text-sm text-green-800 space-y-1">
+                        <li>• Bash/shell scripts for cron jobs</li>
+                        <li>• Must start with shebang (#!/bin/bash)</li>
+                        <li>• Executable permissions automatically set</li>
+                        <li>• Can be selected when creating cron jobs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-blue-900 mb-2">Systemd Units (.service)</h3>
+                    <ul class="text-sm text-blue-800 space-y-1">
+                        <li>• Service configuration files</li>
+                        <li>• Must contain [Unit] or [Service] section</li>
+                        <li>• Automatically synced to /etc/systemd/system</li>
+                        <li>• Can be selected when creating services</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+{{template "modal" dict "id" "uploadModal" "title" "Upload File" "icon" "upload" "size" "lg"}}
+
+<!-- Create File Modal -->
+{{template "modal" dict "id" "createModal" "title" "Create New File" "icon" "file" "size" "4xl"}}
+
+<!-- View File Modal -->
+{{template "modal" dict "id" "viewModal" "title" "View File" "icon" "view" "size" "4xl"}}
+
+<!-- Edit File Modal -->
+{{template "modal" dict "id" "editModal" "title" "Edit File" "icon" "edit" "size" "4xl"}}
+
+<style>
+.file-tab {
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    color: #6B7280;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+}
+.file-tab.active {
+    color: #2563EB;
+    border-bottom-color: #2563EB;
+}
+.file-tab:hover {
+    background-color: #F3F4F6;
+}
+</style>
+
+<script>
+function switchFileTab(type) {
+    // Update tab styles
+    document.querySelectorAll('.file-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + type).classList.add('active');
+    
+    // Filter files
+    const cards = document.querySelectorAll('[data-file-type]');
+    cards.forEach(card => {
+        if (type === 'all' || card.dataset.fileType === type) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function openUploadModal() {
+    const body = `
+        <form id="uploadForm" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">File Type</label>
+                <select name="file_type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="cron">Cron Script (.sh)</option>
+                    <option value="systemd">Systemd Unit (.service)</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select File</label>
+                <input type="file" name="file" required accept=".sh,.service"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
+                    Upload
+                </button>
+                <button type="button" onclick="closeModal('uploadModal')" 
+                    class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    openModal('uploadModal', 'Upload File', body);
+    
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        try {
+            const response = await fetch('/files/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                alert('File uploaded successfully!');
+                window.location.reload();
+            } else {
+                const error = await response.text();
+                alert('Upload failed: ' + error);
+            }
+        } catch (error) {
+            alert('Upload error: ' + error);
+        }
+    });
+}
+
+function openCreateFileModal() {
+    const body = `
+        <form id="createForm" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filename</label>
+                    <input type="text" name="filename" required placeholder="my-script.sh"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">File Type</label>
+                    <select name="file_type" required onchange="updateFileTemplate(this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="cron">Cron Script (.sh)</option>
+                        <option value="systemd">Systemd Unit (.service)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                <textarea name="content" id="createContent" rows="15" required
+                    class="w-full px-3 py-2 bg-gray-900 text-green-400 font-mono text-sm rounded-lg border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 font-medium">
+                    Create File
+                </button>
+                <button type="button" onclick="closeModal('createModal')" 
+                    class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    `;
+    
+    openModal('createModal', 'Create New File', body);
+    updateFileTemplate('cron');
+    
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        try {
+            const response = await fetch('/files/create', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                alert('File created successfully!');
+                window.location.reload();
+            } else {
+                const error = await response.text();
+                alert('Creation failed: ' + error);
+            }
+        } catch (error) {
+            alert('Creation error: ' + error);
+        }
+    });
+}
+
+function updateFileTemplate(type) {
+    const textarea = document.getElementById('createContent');
+    if (!textarea) return;
+    
+    if (type === 'cron') {
+        textarea.value = `#!/bin/bash
+# Cron script template
+# Add your commands below
+
+set -e  # Exit on error
+
+# Your script here
+echo "Script started at $(date)"
+
+# Example commands:
+# ls -la /path/to/directory
+# /path/to/your/command
+
+echo "Script completed successfully"
+`;
+    } else if (type === 'systemd') {
+        textarea.value = `[Unit]
+Description=My Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/myapp
+ExecStart=/usr/bin/myapp
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+`;
+    }
+}
+
+async function viewFile(id) {
+    try {
+        const response = await fetch(\`/files/view?id=\${id}\`);
+        const data = await response.json();
+        
+        const body = \`
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                <pre class="text-green-400 font-mono text-sm whitespace-pre-wrap">\${escapeHtml(data.content)}</pre>
+            </div>
+            <div class="mt-4 text-sm text-gray-600 space-y-1">
+                <p><strong>Filename:</strong> \${data.filename}</p>
+                <p><strong>Type:</strong> \${data.file_type}</p>
+                <p><strong>Size:</strong> \${formatBytes(data.size)}</p>
+                <p><strong>Modified:</strong> \${new Date(data.updated_at).toLocaleString()}</p>
+            </div>
+        \`;
+        
+        openModal('viewModal', data.filename, body);
+    } catch (error) {
+        alert('Error loading file: ' + error);
+    }
+}
+
+async function editFile(id) {
+    try {
+        const response = await fetch(\`/files/view?id=\${id}\`);
+        const data = await response.json();
+        
+        const body = \`
+            <form id="editForm">
+                <input type="hidden" name="id" value="\${id}">
+                <textarea name="content" rows="20"
+                    class="w-full px-4 py-3 bg-gray-900 text-green-400 font-mono text-sm rounded-lg border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">\${escapeHtml(data.content)}</textarea>
+                <div class="mt-4 flex gap-3">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
+                        Save Changes
+                    </button>
+                    <button type="button" onclick="closeModal('editModal')" 
+                        class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        \`;
+        
+        openModal('editModal', 'Edit ' + data.filename, body);
+        
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/files/edit', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('File saved successfully!');
+                    closeModal('editModal');
+                    window.location.reload();
+                } else {
+                    alert('Error saving file');
+                }
+            } catch (error) {
+                alert('Error saving file: ' + error);
+            }
+        });
+    } catch (error) {
+        alert('Error loading file: ' + error);
+    }
+}
+
+async function deleteFile(id, filename) {
+    if (!confirm(\`Delete file "\${filename}"? This action cannot be undone.\`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(\`/files/delete?id=\${id}\`, { method: 'POST' });
+        if (response.ok) {
+            alert('File deleted successfully!');
+            window.location.reload();
+        } else {
+            const error = await response.text();
+            alert('Delete failed: ' + error);
+        }
+    } catch (error) {
+        alert('Delete error: ' + error);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+</script>
+{{end}}
